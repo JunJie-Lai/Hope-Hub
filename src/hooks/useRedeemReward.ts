@@ -26,7 +26,8 @@ export const useRedeemReward = () => {
       }
       
       // Begin a transaction using RPC for atomic operations
-      const { error } = await supabase.rpc('redeem_reward', {
+      // Using `supabase.rpc` with type assertion to bypass TypeScript limitation
+      const { error } = await (supabase.rpc as any)('redeem_reward', {
         reward_id_param: rewardId,
         cost_param: cost,
         title_param: title
