@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,15 +5,40 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Report = () => {
   const navigate = useNavigate();
   const [submitted, setSubmitted] = useState(false);
   const [location, setLocation] = useState("San Jose Downtown");
+  const [description, setDescription] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('crime_report')
+        .insert([
+          {
+            location,
+            description,
+          }
+        ]);
+
+      if (error) throw error;
+
+      setSubmitted(true);
+      toast.success("Report submitted successfully!");
+    } catch (error) {
+      console.error('Error submitting report:', error);
+      toast.error("Failed to submit report. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -42,6 +66,7 @@ const Report = () => {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className="text-xl p-6"
+                    required
                   />
                   <p className="text-gray-500">Edit if wrong</p>
                 </div>
@@ -52,8 +77,11 @@ const Report = () => {
                   </label>
                   <Textarea
                     id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Type or speak what you saw..."
                     className="min-h-[200px] text-xl p-6"
+                    required
                   />
                 </div>
 
@@ -79,8 +107,9 @@ const Report = () => {
                 <Button
                   type="submit"
                   className="w-full bg-purple-500 hover:bg-purple-600 text-white text-xl py-7"
+                  disabled={isSubmitting}
                 >
-                  Send Report
+                  {isSubmitting ? "Sending..." : "Send Report"}
                 </Button>
               </form>
             </Card>
@@ -105,7 +134,7 @@ const Report = () => {
           </>
         )}
         
-        {/* Go Back Button (only shown on form view) */}
+        {/* Go Back Button */}
         {!submitted && (
           <div className="pt-4 animate-fade-in">
             <Button 

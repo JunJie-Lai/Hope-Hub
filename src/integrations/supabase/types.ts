@@ -335,7 +335,11 @@ export type Database = {
         }[]
       }
       redeem_reward: {
-        Args: Record<PropertyKey, never>
+        Args: {
+          reward_id_param: string
+          cost_param: number
+          title_param: string
+        }
         Returns: undefined
       }
     }
