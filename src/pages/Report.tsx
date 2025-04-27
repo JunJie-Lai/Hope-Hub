@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
@@ -14,20 +15,43 @@ const Report = () => {
   const [location, setLocation] = useState("San Jose Downtown");
   const [description, setDescription] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Get current user's ID when component mounts
+  useEffect(() => {
+    const fetchUserId = async () => {
+      const { data } = await supabase.auth.getUser();
+      if (data?.user) {
+        setUserId(data.user.id);
+      } else {
+        // If no user is logged in, redirect to auth page
+        navigate('/auth');
+        toast.error("Please log in to submit a report");
+      }
+    };
+
+    fetchUserId();
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!userId) {
+      toast.error("You must be logged in to submit a report");
+      navigate('/auth');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const { error } = await supabase
         .from('crime_report')
-        .insert([
-          {
-            location,
-            description,
-          }
-        ]);
+        .insert({
+          location,
+          description,
+          user_id: userId
+        });
 
       if (error) throw error;
 
