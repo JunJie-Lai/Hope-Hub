@@ -77,7 +77,7 @@ const App = () => {
               <Route
                 path="/mobile"
                 element={
-                  <AuthRouteGuard>
+                  <AuthRouteGuard requireAuth={false}>
                     <Mobile />
                   </AuthRouteGuard>
                 }
