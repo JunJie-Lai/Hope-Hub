@@ -146,7 +146,6 @@ export type Database = {
           id: string
           location: string
           points: number
-          poster_id: string
           title: string
         }
         Insert: {
@@ -155,7 +154,6 @@ export type Database = {
           id?: string
           location: string
           points: number
-          poster_id: string
           title: string
         }
         Update: {
@@ -164,7 +162,6 @@ export type Database = {
           id?: string
           location?: string
           points?: number
-          poster_id?: string
           title?: string
         }
         Relationships: []
