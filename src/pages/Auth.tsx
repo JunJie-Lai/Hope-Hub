@@ -21,26 +21,24 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        // First check if phone exists in auth.users
-        const { data: userData, error: userError } = await supabase
-          .from('auth.users')
-          .select('id')
-          .eq('phone', phone)
-          .single();
-
-        if (userError || !userData) {
-          toast.error("No account found with this phone number");
-          return;
-        }
-
-        const { error } = await supabase.auth.signInAnonymously({
+        // For login, we'll sign in anonymously with phone metadata
+        // The server-side function will handle verification
+        const { data: { session }, error } = await supabase.auth.signInAnonymously({
           options: {
             data: {
               phone: phone
             }
           }
         });
+        
         if (error) throw error;
+        
+        // If we don't have a session, something went wrong
+        if (!session) {
+          toast.error("Login failed, please check your phone number");
+          setLoading(false);
+          return;
+        }
       } else {
         const { error: signUpError } = await supabase.auth.signInAnonymously({
           options: {
