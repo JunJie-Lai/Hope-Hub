@@ -1,8 +1,9 @@
-
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trophy, ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Table, 
   TableBody, 
@@ -14,6 +15,26 @@ import {
 
 const Points = () => {
   const navigate = useNavigate();
+  const [points, setPoints] = useState<number | null>(null);
+
+  useEffect(() => {
+    const fetchWalletPoints = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: wallet } = await supabase
+        .from('wallet')
+        .select('points')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (wallet) {
+        setPoints(wallet.points);
+      }
+    };
+
+    fetchWalletPoints();
+  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -22,7 +43,7 @@ const Points = () => {
         <div className="text-center space-y-6 animate-fade-in">
           <div className="text-6xl">🏆</div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            You have 750 HopePoints!
+            You have {points ?? '...'} HopePoints!
           </h1>
         </div>
         
