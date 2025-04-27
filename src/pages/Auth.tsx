@@ -48,12 +48,14 @@ const Auth = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User creation failed');
 
-        // Create wallet for new user
+        // Create wallet for new user with the current timestamp for updated_at field
         const { error: walletError } = await supabase
           .from('wallet')
-          .insert([
-            { id: user.id, points: 0 }
-          ]);
+          .insert({
+            id: user.id,
+            points: 0,
+            updated_at: new Date().toISOString()
+          });
         
         if (walletError) throw walletError;
       }
