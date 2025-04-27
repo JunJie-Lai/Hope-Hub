@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Mobile from "./pages/Mobile";
 import Auth from "./pages/Auth";
-import { AuthWrapper } from "./components/AuthWrapper";
+import { AuthRouteGuard } from "./components/AuthRouteGuard";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -26,53 +26,60 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/auth" element={<Auth />} />
+              <Route 
+                path="/auth" 
+                element={
+                  <AuthRouteGuard requireAuth={false}>
+                    <Auth />
+                  </AuthRouteGuard>
+                } 
+              />
               <Route
                 path="/"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Index />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route
                 path="/points"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Points />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route
                 path="/work"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Work />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route
                 path="/report"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Report />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route
                 path="/admin"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Admin />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route
                 path="/mobile"
                 element={
-                  <AuthWrapper>
+                  <AuthRouteGuard>
                     <Mobile />
-                  </AuthWrapper>
+                  </AuthRouteGuard>
                 }
               />
               <Route path="*" element={<NotFound />} />
