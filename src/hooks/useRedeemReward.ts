@@ -16,7 +16,7 @@ export const useRedeemReward = () => {
       
       // Call the database function we created for redeeming rewards
       // Using type assertion to avoid TypeScript errors since the function is not in the types file
-      const { error } = await supabase.rpc('redeem_reward' as any, {
+      const { error } = await supabase.rpc('redeem_reward', {
         reward_id_param: rewardId,
         cost_param: cost,
         title_param: title
