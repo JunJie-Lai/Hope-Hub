@@ -11,6 +11,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
+  const [phone, setPhone] = useState('');
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +22,8 @@ const Auth = () => {
         options: {
           data: {
             first_name: firstName,
-            last_name: lastName
+            last_name: lastName,
+            phone: phone
           }
         }
       });
@@ -78,6 +80,17 @@ const Auth = () => {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Doe"
+              />
+            </div>
+            <div>
+              <Label htmlFor="phone">Phone Number</Label>
+              <Input
+                id="phone"
+                type="tel"
+                required
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="123-456-7890"
               />
             </div>
           </div>
