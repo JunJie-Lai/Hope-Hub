@@ -2,8 +2,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from './ui/skeleton';
 
-export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
+export const AuthGuard = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -27,7 +28,11 @@ export const AuthWrapper = ({ children }: { children: React.ReactNode }) => {
   }, [navigate, loading]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Skeleton className="h-32 w-32" />
+      </div>
+    );
   }
 
   return <>{children}</>;

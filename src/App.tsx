@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Mobile from "./pages/Mobile";
 import Auth from "./pages/Auth";
-import { AuthWrapper } from "./components/AuthWrapper";
+import { AuthGuard } from "./components/AuthGuard";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -30,49 +30,49 @@ const App = () => {
               <Route
                 path="/"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Index />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route
                 path="/points"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Points />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route
                 path="/work"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Work />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route
                 path="/report"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Report />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route
                 path="/admin"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Admin />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route
                 path="/mobile"
                 element={
-                  <AuthWrapper>
+                  <AuthGuard>
                     <Mobile />
-                  </AuthWrapper>
+                  </AuthGuard>
                 }
               />
               <Route path="*" element={<NotFound />} />
