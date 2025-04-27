@@ -25,8 +25,8 @@ export const useRedeemReward = () => {
         throw new Error(`Not enough points. You need ${cost} points but have ${currentPoints}`);
       }
       
-      // Call the RPC function directly
-      const { error } = await supabase.rpc('redeem_reward', {
+      // Call the RPC function with proper type assertion
+      const { error } = await (supabase.rpc as any)('redeem_reward', {
         reward_id_param: rewardId,
         cost_param: cost,
         title_param: title
