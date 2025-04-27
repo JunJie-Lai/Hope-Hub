@@ -21,8 +21,20 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        // For login, we'll sign in anonymously with phone metadata
-        // The server-side function will handle verification
+        // First check if the phone number exists
+        const { data: users, error: checkError } = await supabase
+          .from('auth.users')
+          .select('phone')
+          .eq('phone', phone)
+          .single();
+
+        if (checkError || !users) {
+          toast.error("Phone number not found. Please register first.");
+          setLoading(false);
+          return;
+        }
+
+        // Phone exists, proceed with login
         const { data: { session }, error } = await supabase.auth.signInAnonymously({
           options: {
             data: {
@@ -33,12 +45,14 @@ const Auth = () => {
         
         if (error) throw error;
         
-        // If we don't have a session, something went wrong
         if (!session) {
           toast.error("Login failed, please check your phone number");
           setLoading(false);
           return;
         }
+
+        toast.success("Successfully logged in!");
+        navigate('/');
       } else {
         const { error: signUpError } = await supabase.auth.signInAnonymously({
           options: {
@@ -67,9 +81,6 @@ const Auth = () => {
         
         if (walletError) throw walletError;
       }
-
-      toast.success(isLogin ? "Successfully logged in!" : "Successfully registered!");
-      navigate('/');
     } catch (error: any) {
       toast.error(error.message);
     } finally {
