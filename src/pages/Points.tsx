@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -6,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Skeleton } from "@/components/ui/skeleton";
+import { toast } from "sonner";
 
 interface Task {
   id: string;
@@ -17,37 +19,64 @@ interface Task {
 const Points = () => {
   const navigate = useNavigate();
   const [points, setPoints] = useState<number | null>(null);
+  const [isLoadingPoints, setIsLoadingPoints] = useState(true);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoadingTasks, setIsLoadingTasks] = useState(true);
 
   useEffect(() => {
     const fetchWalletPoints = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      try {
+        setIsLoadingPoints(true);
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          console.error("No authenticated user found");
+          return;
+        }
 
-      const { data: wallet } = await supabase
-        .from('wallet')
-        .select('points')
-        .eq('id', user.id)
-        .maybeSingle();
+        console.log("Fetching wallet for user:", user.id);
+        const { data: wallet, error } = await supabase
+          .from('wallet')
+          .select('points')
+          .eq('id', user.id)
+          .maybeSingle();
 
-      if (wallet) {
-        setPoints(wallet.points);
+        if (error) {
+          console.error('Error fetching wallet points:', error);
+          return;
+        }
+
+        if (wallet) {
+          console.log("Wallet data:", wallet);
+          setPoints(wallet.points);
+        } else {
+          console.log("No wallet found for user");
+        }
+      } catch (error) {
+        console.error("Error in fetchWalletPoints:", error);
+      } finally {
+        setIsLoadingPoints(false);
       }
     };
 
     const fetchTasks = async () => {
       try {
-        const { data: tasks, error } = await supabase
+        setIsLoadingTasks(true);
+        console.log("Fetching tasks...");
+        const { data: tasksData, error } = await supabase
           .from('tasks')
           .select('*');
 
         if (error) {
           console.error('Error fetching tasks:', error);
+          toast.error("Failed to load tasks");
           return;
         }
 
-        setTasks(tasks || []);
+        console.log("Tasks data:", tasksData);
+        setTasks(tasksData || []);
+      } catch (error) {
+        console.error("Error in fetchTasks:", error);
+        toast.error("Failed to load tasks");
       } finally {
         setIsLoadingTasks(false);
       }
@@ -64,7 +93,7 @@ const Points = () => {
         <div className="text-center space-y-6 animate-fade-in">
           <div className="text-6xl">🏆</div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            You have {points ?? 0} HopePoints!
+            {isLoadingPoints ? "Loading points..." : `You have ${points ?? 0} HopePoints!`}
           </h1>
         </div>
         
