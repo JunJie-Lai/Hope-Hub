@@ -10,6 +10,30 @@ export const useTaskActions = () => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
+    // Check if wallet exists, create if it doesn't
+    const { data: walletData } = await supabase
+      .from('wallet')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!walletData) {
+      // Create wallet for the user
+      const { error: walletError } = await supabase
+        .from('wallet')
+        .insert({
+          id: user.id,
+          points: 0,
+          updated_at: new Date().toISOString()
+        });
+
+      if (walletError) {
+        console.error('Error creating wallet:', walletError);
+        toast.error("Failed to initialize wallet");
+        return false;
+      }
+    }
+
     const { error } = await supabase
       .from('active_tasks')
       .insert({
@@ -30,6 +54,30 @@ export const useTaskActions = () => {
   const finishTask = async (taskId: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
+
+    // Check if wallet exists, create if it doesn't
+    const { data: walletData } = await supabase
+      .from('wallet')
+      .select('id')
+      .eq('id', user.id)
+      .maybeSingle();
+
+    if (!walletData) {
+      // Create wallet for the user
+      const { error: walletError } = await supabase
+        .from('wallet')
+        .insert({
+          id: user.id,
+          points: 0,
+          updated_at: new Date().toISOString()
+        });
+
+      if (walletError) {
+        console.error('Error creating wallet:', walletError);
+        toast.error("Failed to initialize wallet");
+        return false;
+      }
+    }
 
     const { error: rpcError } = await supabase
       .rpc('complete_task', {

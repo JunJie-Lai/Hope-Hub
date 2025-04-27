@@ -21,6 +21,23 @@ export const useWalletPoints = () => {
         throw error;
       }
 
+      // If wallet doesn't exist, create it
+      if (!wallet) {
+        const { error: insertError } = await supabase
+          .from('wallet')
+          .insert({
+            id: user.id,
+            points: 0,
+            updated_at: new Date().toISOString()
+          });
+        
+        if (insertError) {
+          throw insertError;
+        }
+        
+        return 0; // New wallet has 0 points
+      }
+
       return wallet?.points ?? 0;
     },
   });
