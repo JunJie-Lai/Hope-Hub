@@ -1,10 +1,16 @@
 import NavigationCard from '@/components/NavigationCard';
 import AdminButton from "@/components/AdminButton";
+import LogoutButton from '@/components/LogoutButton';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+        {/* Add logout button in header */}
+        <div className="flex justify-end">
+          <LogoutButton />
+        </div>
+
         <div className="text-center space-y-4 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
             HopeHub
