@@ -21,7 +21,18 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        // Login flow - only requires phone
+        // First check if phone exists in auth.users
+        const { data: userData, error: userError } = await supabase
+          .from('auth.users')
+          .select('id')
+          .eq('phone', phone)
+          .single();
+
+        if (userError || !userData) {
+          toast.error("No account found with this phone number");
+          return;
+        }
+
         const { error } = await supabase.auth.signInAnonymously({
           options: {
             data: {
@@ -31,13 +42,12 @@ const Auth = () => {
         });
         if (error) throw error;
       } else {
-        // Register flow - requires all fields
         const { error: signUpError } = await supabase.auth.signInAnonymously({
           options: {
             data: {
               first_name: firstName,
               last_name: lastName,
-              phone: phone
+              phone: phone // This will be automatically added to auth.users.phone by our trigger
             }
           }
         });
@@ -48,7 +58,7 @@ const Auth = () => {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) throw new Error('User creation failed');
 
-        // Create wallet for new user with the current timestamp for updated_at field
+        // Create wallet for new user
         const { error: walletError } = await supabase
           .from('wallet')
           .insert({
