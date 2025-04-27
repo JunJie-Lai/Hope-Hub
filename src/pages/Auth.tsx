@@ -21,8 +21,6 @@ const Auth = () => {
     
     try {
       if (isLogin) {
-        // For login, we'll sign in anonymously with phone metadata
-        // The server-side function will handle verification
         const { data: { session }, error } = await supabase.auth.signInAnonymously({
           options: {
             data: {
@@ -33,12 +31,28 @@ const Auth = () => {
         
         if (error) throw error;
         
-        // If we don't have a session, something went wrong
         if (!session) {
           toast.error("Login failed, please check your phone number");
           setLoading(false);
           return;
         }
+
+        // After successful login, ensure wallet exists
+        const { error: walletError } = await supabase
+          .from('wallet')
+          .insert({
+            id: session.user.id,
+            points: 0,
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        // If wallet already exists, that's fine - continue with login
+        if (walletError && !walletError.message.includes('duplicate key')) {
+          throw walletError;
+        }
+
       } else {
         const { error: signUpError } = await supabase.auth.signInAnonymously({
           options: {
