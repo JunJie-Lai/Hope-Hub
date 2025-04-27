@@ -38,6 +38,35 @@ export type Database = {
           },
         ]
       }
+      active_tasks: {
+        Row: {
+          created_at: string
+          id: string
+          task_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          task_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          task_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "active_tasks_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       active_work: {
         Row: {
           created_at: string
@@ -291,6 +320,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_task: {
+        Args: { task_id_param: string; user_id_param: string }
+        Returns: undefined
+      }
       get_transaction_history: {
         Args: { user_id_param: string }
         Returns: {
