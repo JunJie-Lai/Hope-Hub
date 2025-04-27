@@ -9,6 +9,35 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      active_jobs: {
+        Row: {
+          created_at: string
+          id: string
+          job_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "active_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       active_reward: {
         Row: {
           created_at: string
@@ -317,6 +346,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      complete_job: {
+        Args: { job_id_param: string; user_id_param: string }
+        Returns: undefined
+      }
       complete_task: {
         Args: { task_id_param: string; user_id_param: string }
         Returns: undefined
