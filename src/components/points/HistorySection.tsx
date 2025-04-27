@@ -7,8 +7,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { format } from "date-fns";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 
 export const HistorySection = () => {
+  const { data: history, isLoading, error } = useTransactionHistory();
+
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
@@ -16,32 +21,42 @@ export const HistorySection = () => {
       </div>
       
       <div className="overflow-x-auto">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="text-lg">Date</TableHead>
-              <TableHead className="text-lg">Action</TableHead>
-              <TableHead className="text-lg">Points</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className="text-base">April 26, 2025</TableCell>
-              <TableCell className="text-base">Attended Workshop</TableCell>
-              <TableCell className="text-base font-semibold text-emerald-700">+75</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-base">April 25, 2025</TableCell>
-              <TableCell className="text-base">Completed Microjob</TableCell>
-              <TableCell className="text-base font-semibold text-emerald-700">+50</TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell className="text-base">April 24, 2025</TableCell>
-              <TableCell className="text-base">Completed Microjob</TableCell>
-              <TableCell className="text-base font-semibold text-emerald-700">+100</TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
+        {isLoading ? (
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Skeleton key={i} className="h-16 w-full" />
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center text-red-600">Failed to load history</div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="text-lg">Date</TableHead>
+                <TableHead className="text-lg">Action</TableHead>
+                <TableHead className="text-lg">Points</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {history?.map((transaction) => (
+                <TableRow key={transaction.id}>
+                  <TableCell className="text-base">
+                    {format(new Date(transaction.created_at), 'MMMM dd, yyyy')}
+                  </TableCell>
+                  <TableCell className="text-base">
+                    {transaction.title || 'Unknown Transaction'}
+                  </TableCell>
+                  <TableCell className={`text-base font-semibold ${
+                    transaction.points > 0 ? 'text-emerald-700' : 'text-red-700'
+                  }`}>
+                    {transaction.points > 0 ? '+' : ''}{transaction.points}
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </div>
     </section>
   );
