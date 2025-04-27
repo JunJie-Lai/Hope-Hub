@@ -1,5 +1,6 @@
 
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,6 +13,7 @@ const Auth = () => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [phone, setPhone] = useState('');
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,7 +61,7 @@ const Auth = () => {
       }
 
       toast.success(isLogin ? "Successfully logged in!" : "Successfully registered!");
-      // No need to navigate here as AuthRouteGuard will handle it
+      navigate('/');
     } catch (error: any) {
       toast.error(error.message);
     } finally {

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import React from "react";
 import Index from "./pages/Index";
 import Points from "./pages/Points";
@@ -13,7 +13,7 @@ import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Mobile from "./pages/Mobile";
 import Auth from "./pages/Auth";
-import { AuthRouteGuard } from "./components/AuthRouteGuard";
+import { AuthWrapper } from "./components/AuthWrapper";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -26,60 +26,53 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route 
-                path="/auth" 
-                element={
-                  <AuthRouteGuard requireAuth={false}>
-                    <Auth />
-                  </AuthRouteGuard>
-                } 
-              />
+              <Route path="/auth" element={<Auth />} />
               <Route
                 path="/"
                 element={
-                  <AuthRouteGuard>
+                  <AuthWrapper>
                     <Index />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route
                 path="/points"
                 element={
-                  <AuthRouteGuard>
+                  <AuthWrapper>
                     <Points />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route
                 path="/work"
                 element={
-                  <AuthRouteGuard>
+                  <AuthWrapper>
                     <Work />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route
                 path="/report"
                 element={
-                  <AuthRouteGuard>
+                  <AuthWrapper>
                     <Report />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route
                 path="/admin"
                 element={
-                  <AuthRouteGuard>
+                  <AuthWrapper>
                     <Admin />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route
                 path="/mobile"
                 element={
-                  <AuthRouteGuard requireAuth={false}>
+                  <AuthWrapper>
                     <Mobile />
-                  </AuthRouteGuard>
+                  </AuthWrapper>
                 }
               />
               <Route path="*" element={<NotFound />} />
