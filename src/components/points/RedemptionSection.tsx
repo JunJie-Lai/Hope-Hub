@@ -3,9 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useRewards } from "@/hooks/useRewards";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useRedeemReward } from "@/hooks/useRedeemReward";
+import { useWalletPoints } from "@/hooks/useWalletPoints";
 
 export const RedemptionSection = () => {
   const { data: rewards, isLoading, error } = useRewards();
+  const { data: walletPoints } = useWalletPoints();
+  const { redeemReward, isRedeeming } = useRedeemReward();
 
   const getEmojiForReward = (title: string) => {
     const emojiMap: { [key: string]: string } = {
@@ -21,6 +25,10 @@ export const RedemptionSection = () => {
     );
     
     return matchedEmoji ? matchedEmoji[1] : '🎁';
+  };
+
+  const handleRedeem = (rewardId: string, cost: number, title: string) => {
+    redeemReward({ rewardId, cost, title });
   };
 
   return (
@@ -54,6 +62,7 @@ export const RedemptionSection = () => {
             const isLastItem = index === rewards.length - 1;
             const isOddTotal = rewards.length % 2 !== 0;
             const shouldSpanFull = isLastItem && isOddTotal;
+            const insufficientPoints = (walletPoints || 0) < reward.cost;
 
             return (
               <Card 
@@ -67,8 +76,14 @@ export const RedemptionSection = () => {
                   <h3 className="text-2xl font-semibold text-gray-800">{reward.title}</h3>
                   <p className="text-xl font-bold text-emerald-700">{reward.cost} HopePoints</p>
                   <p className="text-gray-600">{reward.description}</p>
-                  <Button className="w-full bg-purple-500 hover:bg-purple-600 text-xl py-6">
-                    Redeem
+                  <Button 
+                    className="w-full bg-purple-500 hover:bg-purple-600 text-xl py-6"
+                    disabled={insufficientPoints || isRedeeming}
+                    onClick={() => handleRedeem(reward.id, reward.cost, reward.title)}
+                  >
+                    {insufficientPoints 
+                      ? `Need ${reward.cost - (walletPoints || 0)} more points` 
+                      : isRedeeming ? "Processing..." : "Redeem"}
                   </Button>
                 </div>
               </Card>
