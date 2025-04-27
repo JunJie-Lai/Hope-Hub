@@ -30,6 +30,10 @@ export const AuthRouteGuard = ({ children, requireAuth = true }: AuthRouteGuardP
         }
       } catch (error) {
         console.error('Auth check error:', error);
+        if (requireAuth) {
+          // Redirect to auth on error if the route requires authentication
+          navigate('/auth');
+        }
       } finally {
         setLoading(false);
       }
