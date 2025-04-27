@@ -20,9 +20,9 @@ export const useTransactionHistory = () => {
       }
 
       const { data, error } = await supabase
-        .rpc('get_transaction_history', { 
-          user_id_param: user.user.id 
-        });
+        .rpc('get_transaction_history', {
+          user_id_param: user.user.id,
+        }) as { data: TransactionHistory[] | null, error: Error | null };
 
       if (error) {
         throw error;
