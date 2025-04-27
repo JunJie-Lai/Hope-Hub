@@ -5,9 +5,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 const Auth = () => {
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -17,30 +18,50 @@ const Auth = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    
     try {
-      const { error } = await supabase.auth.signInAnonymously({
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-            phone: phone
+      if (isLogin) {
+        // Login flow - only requires phone
+        const { error } = await supabase.auth.signInAnonymously({
+          options: {
+            data: {
+              phone: phone
+            }
           }
-        }
-      });
+        });
+        if (error) throw error;
+      } else {
+        // Register flow - requires all fields
+        const { error: signUpError } = await supabase.auth.signInAnonymously({
+          options: {
+            data: {
+              first_name: firstName,
+              last_name: lastName,
+              phone: phone
+            }
+          }
+        });
+        
+        if (signUpError) throw signUpError;
 
-      if (error) throw error;
+        // Get the newly created user
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) throw new Error('User creation failed');
 
-      toast({
-        title: "Success",
-        description: "Successfully signed in!",
-      });
+        // Create wallet for new user
+        const { error: walletError } = await supabase
+          .from('wallet')
+          .insert([
+            { id: user.id, points: 0 }
+          ]);
+        
+        if (walletError) throw walletError;
+      }
+
+      toast.success(isLogin ? "Successfully logged in!" : "Successfully registered!");
       navigate('/');
     } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error.message,
-      });
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
@@ -51,37 +72,41 @@ const Auth = () => {
       <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg">
         <div className="text-center">
           <h2 className="text-3xl font-extrabold text-gray-900">
-            Welcome
+            {isLogin ? "Welcome Back" : "Create Account"}
           </h2>
           <p className="mt-2 text-gray-600">
-            Please enter your information to continue
+            {isLogin ? "Please enter your phone number to continue" : "Please fill in your information to register"}
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="mt-8 space-y-6">
           <div className="space-y-4">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                type="text"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="John"
-              />
-            </div>
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                type="text"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                placeholder="Doe"
-              />
-            </div>
+            {!isLogin && (
+              <>
+                <div>
+                  <Label htmlFor="firstName">First Name</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    required={!isLogin}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="John"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="lastName">Last Name</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    required={!isLogin}
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Doe"
+                  />
+                </div>
+              </>
+            )}
             <div>
               <Label htmlFor="phone">Phone Number</Label>
               <Input
@@ -96,8 +121,18 @@ const Auth = () => {
           </div>
 
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Loading..." : "Continue"}
+            {loading ? "Loading..." : (isLogin ? "Login" : "Register")}
           </Button>
+
+          <div className="text-center">
+            <button
+              type="button"
+              onClick={() => setIsLogin(!isLogin)}
+              className="text-sm text-blue-600 hover:text-blue-800"
+            >
+              {isLogin ? "Need to create an account?" : "Already have an account?"}
+            </button>
+          </div>
         </form>
       </div>
     </div>
