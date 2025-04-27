@@ -334,6 +334,10 @@ export type Database = {
           title: string
         }[]
       }
+      redeem_reward: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

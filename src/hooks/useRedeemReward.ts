@@ -14,9 +14,9 @@ export const useRedeemReward = () => {
     mutationFn: async ({ rewardId, cost, title }: { rewardId: string; cost: number; title: string }) => {
       setIsRedeeming(true);
       
-      // Call the database function we created for redeeming rewards
+      // Call the database function for redeeming rewards
       // Using type assertion to avoid TypeScript errors since the function is not in the types file
-      const { error } = await supabase.rpc('redeem_reward', {
+      const { error } = await supabase.rpc('redeem_reward' as unknown as any, {
         reward_id_param: rewardId,
         cost_param: cost,
         title_param: title
