@@ -50,19 +50,30 @@ export const RedemptionSection = () => {
         <div className="text-center text-red-600">Failed to load rewards</div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2">
-          {rewards?.map((reward) => (
-            <Card key={reward.id} className="p-6 bg-white border-2 border-gray-200 shadow-md rounded-xl">
-              <div className="space-y-4 text-center">
-                <div className="text-4xl">{getEmojiForReward(reward.title)}</div>
-                <h3 className="text-2xl font-semibold text-gray-800">{reward.title}</h3>
-                <p className="text-xl font-bold text-emerald-700">{reward.cost} HopePoints</p>
-                <p className="text-gray-600">{reward.description}</p>
-                <Button className="w-full bg-purple-500 hover:bg-purple-600 text-xl py-6">
-                  Redeem
-                </Button>
-              </div>
-            </Card>
-          ))}
+          {rewards?.map((reward, index) => {
+            const isLastItem = index === rewards.length - 1;
+            const isOddTotal = rewards.length % 2 !== 0;
+            const shouldSpanFull = isLastItem && isOddTotal;
+
+            return (
+              <Card 
+                key={reward.id} 
+                className={`p-6 bg-white border-2 border-gray-200 shadow-md rounded-xl ${
+                  shouldSpanFull ? 'md:col-span-2' : ''
+                }`}
+              >
+                <div className="space-y-4 text-center">
+                  <div className="text-4xl">{getEmojiForReward(reward.title)}</div>
+                  <h3 className="text-2xl font-semibold text-gray-800">{reward.title}</h3>
+                  <p className="text-xl font-bold text-emerald-700">{reward.cost} HopePoints</p>
+                  <p className="text-gray-600">{reward.description}</p>
+                  <Button className="w-full bg-purple-500 hover:bg-purple-600 text-xl py-6">
+                    Redeem
+                  </Button>
+                </div>
+              </Card>
+            );
+          })}
         </div>
       )}
     </section>
