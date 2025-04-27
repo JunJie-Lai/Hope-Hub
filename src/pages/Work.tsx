@@ -28,6 +28,18 @@ const Work = () => {
   const { refetch: refetchWallet } = useWalletPoints();
 
   useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        navigate('/auth');
+        return;
+      }
+    };
+    
+    checkAuth();
+  }, [navigate]);
+
+  useEffect(() => {
     const fetchJobs = async () => {
       try {
         const { data, error } = await supabase
