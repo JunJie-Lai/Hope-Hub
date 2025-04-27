@@ -14,19 +14,8 @@ export const useRedeemReward = () => {
     mutationFn: async ({ rewardId, cost, title }: { rewardId: string; cost: number; title: string }) => {
       setIsRedeeming(true);
       
-      // Check if user is authenticated
-      const { data: user } = await supabase.auth.getUser();
-      if (!user.user) {
-        throw new Error("You must be logged in to redeem rewards");
-      }
-      
-      // Check if user has enough points
-      if (currentPoints < cost) {
-        throw new Error(`Not enough points. You need ${cost} points but have ${currentPoints}`);
-      }
-      
-      // Call the RPC function with proper type assertion
-      const { error } = await (supabase.rpc as any)('redeem_reward', {
+      // Call the database function we created for redeeming rewards
+      const { error } = await supabase.rpc('redeem_reward', {
         reward_id_param: rewardId,
         cost_param: cost,
         title_param: title
