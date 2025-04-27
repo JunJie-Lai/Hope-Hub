@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,9 +12,10 @@ import Report from "./pages/Report";
 import NotFound from "./pages/NotFound";
 import Admin from "./pages/Admin";
 import Mobile from "./pages/Mobile";
+import Auth from "./pages/Auth";
+import { AuthWrapper } from "./components/AuthWrapper";
 
 const App = () => {
-  // Create a client
   const queryClient = new QueryClient();
 
   return (
@@ -24,12 +26,55 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/points" element={<Points />} />
-              <Route path="/work" element={<Work />} />
-              <Route path="/report" element={<Report />} />
-              <Route path="/admin" element={<Admin />} />
-              <Route path="/mobile" element={<Mobile />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route
+                path="/"
+                element={
+                  <AuthWrapper>
+                    <Index />
+                  </AuthWrapper>
+                }
+              />
+              <Route
+                path="/points"
+                element={
+                  <AuthWrapper>
+                    <Points />
+                  </AuthWrapper>
+                }
+              />
+              <Route
+                path="/work"
+                element={
+                  <AuthWrapper>
+                    <Work />
+                  </AuthWrapper>
+                }
+              />
+              <Route
+                path="/report"
+                element={
+                  <AuthWrapper>
+                    <Report />
+                  </AuthWrapper>
+                }
+              />
+              <Route
+                path="/admin"
+                element={
+                  <AuthWrapper>
+                    <Admin />
+                  </AuthWrapper>
+                }
+              />
+              <Route
+                path="/mobile"
+                element={
+                  <AuthWrapper>
+                    <Mobile />
+                  </AuthWrapper>
+                }
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
