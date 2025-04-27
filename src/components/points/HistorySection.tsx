@@ -14,6 +14,11 @@ import { useTransactionHistory } from "@/hooks/useTransactionHistory";
 export const HistorySection = () => {
   const { data: history, isLoading, error } = useTransactionHistory();
 
+  const formatTransactionType = (type: string | null) => {
+    if (!type) return 'Unknown';
+    return type.charAt(0).toUpperCase() + type.slice(1);
+  };
+
   return (
     <section className="space-y-6 animate-fade-in">
       <div className="text-center mb-8">
@@ -35,6 +40,7 @@ export const HistorySection = () => {
               <TableRow>
                 <TableHead className="text-lg">Date</TableHead>
                 <TableHead className="text-lg">Action</TableHead>
+                <TableHead className="text-lg">Type</TableHead>
                 <TableHead className="text-lg">Points</TableHead>
               </TableRow>
             </TableHeader>
@@ -46,6 +52,9 @@ export const HistorySection = () => {
                   </TableCell>
                   <TableCell className="text-base">
                     {transaction.title || 'Unknown Transaction'}
+                  </TableCell>
+                  <TableCell className="text-base capitalize">
+                    {formatTransactionType(transaction.type)}
                   </TableCell>
                   <TableCell className={`text-base font-semibold ${
                     transaction.points > 0 ? 'text-emerald-700' : 'text-red-700'
@@ -61,3 +70,4 @@ export const HistorySection = () => {
     </section>
   );
 };
+
