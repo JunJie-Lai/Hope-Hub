@@ -76,7 +76,7 @@ const Work = () => {
                   
                   <div className="flex justify-between items-center">
                     <span className="text-lg text-gray-600">📍 {job.location}</span>
-                    <span className="text-xl font-bold text-emerald-700">🪙 {job.points} HopePoints</span>
+                    <span className="text-xl font-bold text-emerald-700">+{job.points} HopePoints</span>
                   </div>
                   
                   <Button className="w-full bg-blue-500 hover:bg-blue-600 text-xl py-6">
