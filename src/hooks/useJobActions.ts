@@ -54,6 +54,7 @@ export const useJobActions = () => {
       console.error('Error removing active job:', deleteError);
     }
 
+    // Invalidate all relevant queries to refresh data
     await Promise.all([
       queryClient.invalidateQueries({ queryKey: ['active-jobs'] }),
       queryClient.invalidateQueries({ queryKey: ['wallet-points'] }),
