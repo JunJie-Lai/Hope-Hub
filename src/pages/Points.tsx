@@ -43,7 +43,7 @@ const Points = () => {
         <div className="text-center space-y-6 animate-fade-in">
           <div className="text-6xl">🏆</div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900">
-            You have {points ?? '...'} HopePoints!
+            You have {points ?? 0} HopePoints!
           </h1>
         </div>
         
