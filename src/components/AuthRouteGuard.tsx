@@ -1,5 +1,5 @@
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from "@/integrations/supabase/client";
 
@@ -10,17 +10,28 @@ interface AuthRouteGuardProps {
 
 export const AuthRouteGuard = ({ children, requireAuth = true }: AuthRouteGuardProps) => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (requireAuth && !session) {
-        // Redirect to auth if user is not logged in and route requires auth
-        navigate('/auth');
-      } else if (!requireAuth && session) {
-        // Redirect to home if user is logged in and route doesn't require auth
-        navigate('/');
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        
+        const isAuthenticated = !!session;
+        setAuthenticated(isAuthenticated);
+        
+        if (requireAuth && !isAuthenticated) {
+          // Redirect to auth if user is not logged in and route requires auth
+          navigate('/auth');
+        } else if (!requireAuth && isAuthenticated) {
+          // Redirect to home if user is logged in and route doesn't require auth
+          navigate('/');
+        }
+      } catch (error) {
+        console.error('Auth check error:', error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -29,9 +40,12 @@ export const AuthRouteGuard = ({ children, requireAuth = true }: AuthRouteGuardP
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (requireAuth && !session) {
+      const isAuthenticated = !!session;
+      setAuthenticated(isAuthenticated);
+      
+      if (requireAuth && !isAuthenticated) {
         navigate('/auth');
-      } else if (!requireAuth && session) {
+      } else if (!requireAuth && isAuthenticated) {
         navigate('/');
       }
     });
@@ -41,5 +55,16 @@ export const AuthRouteGuard = ({ children, requireAuth = true }: AuthRouteGuardP
     };
   }, [navigate, requireAuth]);
 
-  return <>{children}</>;
+  // Show loading state while checking authentication
+  if (loading) {
+    return <div className="flex items-center justify-center h-screen">Loading...</div>;
+  }
+
+  // If authentication check is complete, render children based on authentication requirements
+  if ((requireAuth && authenticated) || (!requireAuth && !authenticated)) {
+    return <>{children}</>;
+  }
+
+  // This should rarely be visible as the navigation should happen immediately
+  return null;
 };
